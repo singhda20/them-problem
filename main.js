@@ -42,28 +42,33 @@ function getThey(you) {
 
 function init(ev) {
   console.debug('fyi, this is what a domcontentloaded event looks like', ev)
+  toggleLoader("you")
 
   // FIXME: notice above that getYous just returns a literal.
   // you should update the code below to instead call getOptions.
   // getOptions expects no arguments, and returns a promise that resolves to an array of strings.
-  const options = getYous()
-  updateRadio(options)
-
-  document.querySelectorAll("input[type='radio']").forEach((input) => {
-    input.addEventListener('change', changed);
-  });
+  const options = getOptions().then((resolve) => {
+    updateRadio(resolve)
+    document.querySelectorAll("input[type='radio']").forEach((input) => {
+      input.addEventListener('change', changed);
+    });
+    toggleLoader("you")
+  })
 }
 
 function changed(ev) {
   console.debug('fyi, this is what a change event looks like', ev)
   const you = ev.target.parentElement.textContent
+  toggleLoader("they")
 
   // FIXME: notice above that getThemProblem just returns a literal.
   // you should update the code below to instead call getThemProblem.
   // getThemProblem expects a string parameter (the only valid strings are those returned by getOptions), and returns a promise that resolves to a string.
-  const they = getThey(you)
-  const output = document.getElementById('they')
-  output.textContent = they
+  const they = getThemProblem(you).then((resolve) => {
+    const output = document.getElementById('they')
+    output.textContent = resolve
+    toggleLoader("they")
+  })
 }
 
 document.addEventListener("DOMContentLoaded", init);
